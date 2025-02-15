@@ -4,7 +4,7 @@ use discord_presence::{models::ActivityType, models::EventData, Client, Event};
 use std::fs;
 use std::io::prelude::*;
 use std::process::exit;
-use std::{env, thread, time};
+use std::{env};
 use text_io::read;
 
 fn help() {
@@ -98,10 +98,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Please enter your jellyfin API key!");
                     exit(1);
                 }
-                if (!config_discord_client_id.is_ok()) {
+                if !config_discord_client_id.is_ok() {
                     println!("No discord client id provided, falling back to default...");
                 }
-                if (config_jellyfin_username.is_empty()) {
+                if config_jellyfin_username.is_empty() {
                     println!("Please enter your Jellyfin username!");
                     exit(1);
                 }
@@ -135,7 +135,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut drcp = Client::new(config_discord_client_id.unwrap_or(1338422523838206014));
 
                 let _ = drcp.on_ready(|ctx| {
-                    let EventData::Ready(data) = ctx.event else {
+                    let EventData::Ready(_data) = ctx.event else {
                         unreachable!();
                     };
                 });
@@ -230,9 +230,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     .ok();
                             }
                         }
-                        let image_status_code =
                             sleep_duration = tokio::time::Duration::from_secs(5);
-                        // Reset to normal interval
                     }
 
                     tokio::time::sleep(sleep_duration).await;
