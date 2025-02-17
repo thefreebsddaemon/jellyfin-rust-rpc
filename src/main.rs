@@ -1,6 +1,6 @@
 use config::File;
 use config::{Config, ConfigError};
-use discord_presence::{models::ActivityType, models::EventData, Client, Event};
+use discord_presence::{models::ActivityType, models::EventData, Client , Event};
 use std::fs;
 use std::io::prelude::*;
 use std::process::exit;
@@ -141,8 +141,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
                 drcp.start();
 
-                drcp.block_until_event(Event::Ready)?;
-
+                drcp.block_until_event(Event::Ready).expect("Error while initializing drcp.");
                 assert!(Client::is_ready());
                 let mut previous_media_name = String::new();
                 let mut sleep_duration = tokio::time::Duration::from_secs(5);
@@ -151,7 +150,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         get_metadata(&config_jellyfin_url, session_endpoint, &config_api_key)
                             .await?;
                     match metadata.get(0) {
-                        None => continue,
+                        None => {
+                            drcp.set_activity(|act| {
+                                act._type(ActivityType::Watching)
+                                    .state("Doing nothing!")
+
+                            }).expect("Failed to set idle activity.");
+                            tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
+                            continue;
+
+                        },
                         Some(_media_name) => {
                             println!("User is playing media!");
                         }
